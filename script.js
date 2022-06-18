@@ -6,6 +6,7 @@ const btnCloseModal = document.querySelector('.btn--close-modal');
 const btnsOpenModal = document.querySelectorAll('.btn--show-modal');
 const btnScrollTo = document.querySelector('.btn--scroll-to');
 const section1 = document.querySelector('#section--1');
+const nav = document.querySelector('.nav');
 const navLinks = document.querySelector('.nav__links');
 const tabs = document.querySelectorAll('.operations__tab');
 const tabsContainer = document.querySelector('.operations__tab-container');
@@ -61,7 +62,7 @@ const navLink = document.querySelectorAll('.nav__link');
 navLink.forEach(function (el) {
   el.addEventListener('click', function (e) {
     e.preventDefault();
-    const id = document.querySelector(this.getAttribute('href'));
+    const id = this.getAttribute('href');
 
     document.querySelector(id).scrollIntoView({ behavior: 'smooth' });
   });
@@ -69,6 +70,7 @@ navLink.forEach(function (el) {
 */
 
 // Efficient (Event Delegation method)
+
 navLinks.addEventListener('click', function (e) {
   e.preventDefault();
   // Matching strategy (for ignoring click that are not nav link)
@@ -80,6 +82,7 @@ navLinks.addEventListener('click', function (e) {
 
 // Tabbed component (using Event Delegation method)
 tabsContainer.addEventListener('click', function (e) {
+  // Using closest instead of simply checking classList.contains because it has child element (span) that might be clicked
   const clicked = e.target.closest('.operations__tab');
 
   // Guard clause
@@ -105,5 +108,35 @@ tabsContainer.addEventListener('click', function (e) {
   document
     .querySelector(`.operations__content--${clicked.dataset.tab}`)
     .classList.add('operations__content--active');
-  console.log(clicked.dataset.tab);
 });
+
+// Menu fade animation
+const handleHover = function (e) {
+  if (e.target.classList.contains('nav__link')) {
+    const link = e.target;
+    const siblings = link.closest('.nav').querySelectorAll('.nav__link');
+    const logo = link.closest('.nav').querySelector('img');
+    siblings.forEach(el => {
+      if (el !== link) el.style.opacity = this;
+    });
+    // Here 'this' is 0.5/1, because we set it manually using bind method
+    logo.style.opacity = this;
+  }
+};
+
+// Passing "argument" into handler
+// Note: In reality we cant really pass argument into handler. We know bind method returns a new function where we can preset 'this'. So we can pass any value in place of 'this' as argument. In case of multiple values, we can pass array in place of 'this'.
+// mouseenter/mouseleave dont bubble, so we use mouseover/mouseout
+
+nav.addEventListener('mouseover', handleHover.bind(0.5));
+nav.addEventListener('mouseout', handleHover.bind(1));
+
+// Alternate way (if problem understanding bind())
+/*
+nav.addEventListener('mouseover', function (e) {
+  handleHover(e, 0.5);
+});
+nav.addEventListener('mouseout', function (e) {
+  handleHover(e, 1);
+});
+*/
