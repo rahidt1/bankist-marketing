@@ -5,6 +5,7 @@ const overlay = document.querySelector('.overlay');
 const btnCloseModal = document.querySelector('.btn--close-modal');
 const btnsOpenModal = document.querySelectorAll('.btn--show-modal');
 const btnScrollTo = document.querySelector('.btn--scroll-to');
+const header = document.querySelector('.header');
 const section1 = document.querySelector('#section--1');
 const nav = document.querySelector('.nav');
 const navLinks = document.querySelector('.nav__links');
@@ -70,7 +71,6 @@ navLink.forEach(function (el) {
 */
 
 // Efficient (Event Delegation method)
-
 navLinks.addEventListener('click', function (e) {
   e.preventDefault();
   // Matching strategy (for ignoring click that are not nav link)
@@ -140,3 +140,30 @@ nav.addEventListener('mouseout', function (e) {
   handleHover(e, 1);
 });
 */
+
+// Sticky navigation
+// Inefficient
+/*
+const initialCords = section1.getBoundingClientRect();
+window.addEventListener('scroll', function () {
+  if (window.scrollY > initialCords.top) nav.classList.add('sticky');
+  else nav.classList.remove('sticky');
+});
+*/
+
+// Sticky navigation (Intersection observer API)
+const navHeight = nav.getBoundingClientRect().height;
+
+const callback = function (entries) {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) nav.classList.add('sticky');
+    else nav.classList.remove('sticky');
+  });
+};
+const options = {
+  root: null, // whole viewport
+  threshold: 0, // as soon as the element moves in or out
+  rootMargin: `-${navHeight}px`,
+};
+const headerObserver = new IntersectionObserver(callback, options);
+headerObserver.observe(header);
