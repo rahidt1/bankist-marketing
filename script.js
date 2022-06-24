@@ -154,16 +154,44 @@ window.addEventListener('scroll', function () {
 // Sticky navigation (Intersection observer API)
 const navHeight = nav.getBoundingClientRect().height;
 
-const callback = function (entries) {
+const headerCallback = function (entries) {
   entries.forEach(entry => {
     if (!entry.isIntersecting) nav.classList.add('sticky');
     else nav.classList.remove('sticky');
   });
 };
-const options = {
+const headerOptions = {
   root: null, // whole viewport
   threshold: 0, // as soon as the element moves in or out
   rootMargin: `-${navHeight}px`,
 };
-const headerObserver = new IntersectionObserver(callback, options);
+const headerObserver = new IntersectionObserver(headerCallback, headerOptions);
 headerObserver.observe(header);
+
+// Reveal sections
+const allSections = document.querySelectorAll('.section');
+
+const sectionCallback = function (entries, observer) {
+  // Destructuring entries
+  const [entry] = entries;
+
+  if (!entry.isIntersecting) return;
+
+  entry.target.classList.remove('section--hidden');
+  observer.unobserve(entry.target);
+};
+
+const sectionOptions = {
+  root: null,
+  threshold: 0.15, //section is revealed when 15% visible
+};
+
+const sectionObserver = new IntersectionObserver(
+  sectionCallback,
+  sectionOptions
+);
+
+allSections.forEach(section => {
+  sectionObserver.observe(section);
+  section.classList.add('section--hidden');
+});
